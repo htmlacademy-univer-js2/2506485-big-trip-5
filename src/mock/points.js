@@ -39,7 +39,7 @@ const pointsMock = [
   },
   {
     'id': '2eb65438-9389-452b-baf6-f1cc15f5437f',
-    'basePrice': 70, 
+    'basePrice': 70,
     'dateFrom': '2025-05-08T13:01:10.697Z',
     'dateTo': '2025-05-10T05:46:10.697Z',
     'destination': '42e96a38-98ef-4ef8-be52-41a1ff308b68',
@@ -47,25 +47,24 @@ const pointsMock = [
     'offers': [
       'c17f2dc1-4a87-4026-9635-258aa99d23f3',
       'e1441111-ac18-4b1c-aead-bc7066bb702c',
-    	'cb0e16a8-ea24-470a-92b0-652c8450d5f9'
+      'cb0e16a8-ea24-470a-92b0-652c8450d5f9'
     ],
     'type': 'taxi'
-	},
-	{
-		'id': '6d08a726-05d9-44bf-9bef-429999f34544',
-		'basePrice': 3643,
-		'dateFrom': '2025-05-11T13:49:10.697Z',
-		'dateTo': '2025-05-13T01:25:10.697Z',
-		'destination': '4d8bf7d7-d5a3-4a6f-9a79-de26c5856028',
-		'isFavorite': true,
-		'offers': [
-			'1c6743a4-b2f9-4fd5-8748-17567c0e9a18',
-			'85199aec-7454-4344-b3b2-afa0e996fa9e',
-			'76056cde-6b2f-44b8-9938-4efef87b33d3'
-		],
-		'type': 'check-in'
-	},
-  
-]
+  },
+  {
+    'id': '6d08a726-05d9-44bf-9bef-429999f34544',
+    'basePrice': 3643,
+    'dateFrom': '2025-05-11T13:49:10.697Z',
+    'dateTo': '2025-05-13T01:25:10.697Z',
+    'destination': '4d8bf7d7-d5a3-4a6f-9a79-de26c5856028',
+    'isFavorite': true,
+    'offers': [
+      '1c6743a4-b2f9-4fd5-8748-17567c0e9a18',
+      '85199aec-7454-4344-b3b2-afa0e996fa9e',
+      '76056cde-6b2f-44b8-9938-4efef87b33d3'
+    ],
+    'type': 'check-in'
+  },
+];
 
-export {pointsMock}
+export {pointsMock};

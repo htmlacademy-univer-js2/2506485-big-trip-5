@@ -30,47 +30,47 @@ const offersMock = [
     ]
   },
   {
-    "type": "train",
-    "offers": [
+    'type': 'train',
+    'offers': [
       {
-        "id": "cb3641dd-cf84-4ab3-aa49-78b7f5da1c65",
-        "title": "Book a taxi at the arrival point",
-        "price": 196
+        'id': 'cb3641dd-cf84-4ab3-aa49-78b7f5da1c65',
+        'title': 'Book a taxi at the arrival point',
+        'price': 196
       },
       {
-        "id": "123f9ada-1c2c-423c-8685-4857eac17a73",
-        "title": "Order a breakfast",
-        "price": 43
+        'id': '123f9ada-1c2c-423c-8685-4857eac17a73',
+        'title': 'Order a breakfast',
+        'price': 43
       }
     ]
   },
-  { 
-    "type": "check-in",
-    "offers": [
+  {
+    'type': 'check-in',
+    'offers': [
       {
-        "id": "1c6743a4-b2f9-4fd5-8748-17567c0e9a18",
-        "title": "Choose the time of check-in",
-        "price": 161
+        'id': '1c6743a4-b2f9-4fd5-8748-17567c0e9a18',
+        'title': 'Choose the time of check-in',
+        'price': 161
       },
       {
-        "id": "85199aec-7454-4344-b3b2-afa0e996fa9e",
-        "title": "Choose the time of check-out",
-        "price": 42
+        'id': '85199aec-7454-4344-b3b2-afa0e996fa9e',
+        'title': 'Choose the time of check-out',
+        'price': 42
       },
       {
-        "id": "76056cde-6b2f-44b8-9938-4efef87b33d3",
-        "title": "Add breakfast",
-        "price": 142
+        'id': '76056cde-6b2f-44b8-9938-4efef87b33d3',
+        'title': 'Add breakfast',
+        'price': 142
       },
       {
-        "id": "e7c11eab-95a0-46ee-89aa-03a7edff3172",
-        "title": "Laundry",
-        "price": 162
+        'id': 'e7c11eab-95a0-46ee-89aa-03a7edff3172',
+        'title': 'Laundry',
+        'price': 162
       },
       {
-        "id": "4c90108e-a1a6-4199-bf78-669ec411949e",
-        "title": "Order a meal from the restaurant",
-        "price": 46
+        'id': '4c90108e-a1a6-4199-bf78-669ec411949e',
+        'title': 'Order a meal from the restaurant',
+        'price': 46
       }
     ]
   },

@@ -51,21 +51,33 @@ function createPointTemplate (point, destination, offers) {
             </div>
           </li>
   `);
-};
+}
 
 export default class PointView extends AbstractView{
   #point = null;
   #destination = null;
   #offers = null;
+  #onOpenEditButtonClick = null;
 
-  constructor(point, destination, offers){
+  constructor(point, destination, offers, onOpenEditButtonClick){
     super();
     this.#point = point;
     this.#destination = destination;
     this.#offers = offers;
+    this.#onOpenEditButtonClick = onOpenEditButtonClick;
+    this.#setEventListeners();
   }
-  
+
   get template() {
     return createPointTemplate(this.#point, this.#destination, this.#offers);
   }
+
+  #setEventListeners () {
+    this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#OpenEditButtonClickHandler);
+  }
+
+  #OpenEditButtonClickHandler = (evt) => {
+    evt.preventDefault(evt);
+    this.#onOpenEditButtonClick();
+  };
 }
