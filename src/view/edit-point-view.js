@@ -1,4 +1,4 @@
-import {createElement} from '../render.js';
+import AbstractView from '../framework/view/abstract-view.js';
 import { getFormatFullDate } from '../utils.js';
 
 function createEditPointTemplate(point, destination, offers) {
@@ -128,26 +128,19 @@ function createEditPointTemplate(point, destination, offers) {
   `;
 }
 
-export default class EditPointView {
+export default class EditPointView extends AbstractView{
+  #point = null;
+  #destination = null;
+  #offers = null;
+
   constructor(point, destination, offers){
-    this.point = point;
-    this.destination = destination;
-    this.offers = offers;
+    super();
+    this.#point = point;
+    this.#destination = destination;
+    this.#offers = offers;
   }
 
-  getTemplate() {
-    return createEditPointTemplate(this.point, this.destination, this.offers);
-  }
-
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
-    }
-
-    return this.element;
-  }
-
-  removeElement() {
-    this.element = null;
+  get template() {
+    return createEditPointTemplate(this.#point, this.#destination, this.#offers);
   }
 }
