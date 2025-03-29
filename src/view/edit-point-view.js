@@ -1,4 +1,4 @@
-import {createElement} from '../render.js';
+import AbstractView from '../framework/view/abstract-view.js';
 import { getFormatFullDate } from '../utils.js';
 
 function createEditPointTemplate(point, destination, offers) {
@@ -128,26 +128,40 @@ function createEditPointTemplate(point, destination, offers) {
   `;
 }
 
-export default class EditPointView {
-  constructor(point, destination, offers){
-    this.point = point;
-    this.destination = destination;
-    this.offers = offers;
+export default class EditPointView extends AbstractView{
+  #point = null;
+  #destination = null;
+  #offers = null;
+  #onCloseEditButtonClick = null;
+  #onSubmitButtonClick = null;
+
+  constructor(point, destination, offers, onCloseEditButtonClick,onSubmitButtonClick){
+    super();
+    this.#point = point;
+    this.#destination = destination;
+    this.#offers = offers;
+    this.#onCloseEditButtonClick = onCloseEditButtonClick;
+    this.#onSubmitButtonClick = onSubmitButtonClick;
+    this.#setEventListeners();
   }
 
-  getTemplate() {
-    return createEditPointTemplate(this.point, this.destination, this.offers);
+  get template() {
+    return createEditPointTemplate(this.#point, this.#destination, this.#offers);
   }
 
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
-    }
+  #setEventListeners () {
+    this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#closeEditButtonClickHandler);
 
-    return this.element;
+    this.element.querySelector('.event__save-btn').addEventListener('submit',this.#submitButtonClickHandler);
   }
 
-  removeElement() {
-    this.element = null;
-  }
+  #closeEditButtonClickHandler = (evt) => {
+    evt.preventDefault(evt);
+    this.#onCloseEditButtonClick();
+  };
+
+  #submitButtonClickHandler = (evt) => {
+    evt.preventDefault(evt);
+    this.#onSubmitButtonClick();
+  };
 }

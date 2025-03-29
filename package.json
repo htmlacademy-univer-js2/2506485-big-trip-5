@@ -31,6 +31,10 @@
     "node": "20"
   },
   "dependencies": {
-    "dayjs": "1.11.7"
+    "css-loader": "^7.1.2",
+    "dayjs": "1.11.7",
+    "install": "^0.13.0",
+    "npm": "^11.2.0",
+    "style-loader": "^4.0.0"
   }
 }
