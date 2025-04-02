@@ -1,5 +1,5 @@
 import AbstractView from '../framework/view/abstract-view.js';
-import { getFormatFullDate } from '../utils.js';
+import { getFormatFullDate } from '../utils/points.js';
 
 function createEditPointTemplate(point, destination, offers) {
   const pointTypeIsChecked = (pointType) => pointType === point.type ? 'checked' : '';

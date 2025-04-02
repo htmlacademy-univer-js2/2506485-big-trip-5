@@ -1,7 +1,7 @@
 import AbstractView from '../framework/view/abstract-view.js';
-import { getFormatDay } from '../utils.js';
-import { getFormatTime } from '../utils.js';
-import { getDuration } from '../utils.js';
+import { getFormatDay } from '../utils/points.js';
+import { getFormatTime } from '../utils/points.js';
+import { getDuration } from '../utils/points.js';
 
 function createPointTemplate (point, destination, offers) {
   const startDate = getFormatDay(point.dateFrom);
