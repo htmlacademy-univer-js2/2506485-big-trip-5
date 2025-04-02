@@ -4,6 +4,7 @@ import EditPointView from '../view/edit-point-view.js';
 import PointListView from '../view/point-list-view.js';
 import PointView from '../view/point-view.js';
 import {render, replace} from '../framework/render.js';
+import { generateFilters } from '../mock/filter.js';
 import EmptyListView from '../view/empty-point-view.js';
 
 export default class Presenter {
@@ -81,7 +82,7 @@ export default class Presenter {
   }
 
   #renderBoard (){
-    render(new FilterView(), this.#filterContainer);
+    render(new FilterView(generateFilters(this.#points)), this.#filterContainer);
     render(new SortView(), this.#tripEventsContainer);
 
     render(this.#pointListComponent, this.#tripEventsContainer);

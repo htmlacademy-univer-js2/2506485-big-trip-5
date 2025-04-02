@@ -32,4 +32,10 @@ const getDuration = (dateFrom, dateTo) => {
   }
 };
 
-export {getFormatTime, getFormatDay, getDuration, getFormatFullDate};
+const isPastPoint = (point) => dayjs(point.dateFrom).isBefore(dayjs());
+
+const isPresentPoint = (point) => dayjs(point.dateFrom).isBefore((dayjs())) && dayjs(point.dateTo).isAfter((dayjs()));
+
+const isFuterePoint = (point) => dayjs(point.dateFrom).isAfter(dayjs());
+
+export {getFormatTime, getFormatDay, getDuration, getFormatFullDate, isFuterePoint, isPastPoint, isPresentPoint};
