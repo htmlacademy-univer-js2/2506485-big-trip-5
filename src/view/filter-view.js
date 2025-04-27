@@ -7,7 +7,8 @@ function createFilterTemplate (filters) {
       ${filter.count === 0 ? 'disabled' : ''} ${filter.type === 'everything' ? 'checked' : ''}>
       <label class="trip-filters__filter-label" for="filter-${filter.type}">${filter.type}</label>
     </div>`).join('')}
-  </form>`)};
+  </form>`);
+}
 
 export default class FilterView extends AbstractView{
   #filters = null;
