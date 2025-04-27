@@ -34,8 +34,12 @@ const getDuration = (dateFrom, dateTo) => {
 
 const isPastPoint = (point) => dayjs(point.dateFrom).isBefore(dayjs());
 
+function updatePointData(points, updatedPointData) {
+  return points.map((point) => point.id === updatedPointData.id ? updatedPointData : point);
+}
+
 const isPresentPoint = (point) => dayjs(point.dateFrom).isBefore((dayjs())) && dayjs(point.dateTo).isAfter((dayjs()));
 
 const isFuterePoint = (point) => dayjs(point.dateFrom).isAfter(dayjs());
 
-export {getFormatTime, getFormatDay, getDuration, getFormatFullDate, isFuterePoint, isPastPoint, isPresentPoint};
+export {getFormatTime, getFormatDay, getDuration, getFormatFullDate, isFuterePoint, isPastPoint, isPresentPoint, updatePointData};
