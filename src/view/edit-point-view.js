@@ -115,11 +115,23 @@ function createEditPointTemplate({point, destination, offers}, allDestinations) 
                     </div>`).join('')}
                     </div>
                   </section>
-
-                  ${destination?.description ? `
+                  ${destination?.description || destination?.pictures?.length ? `
                     <section class="event__section  event__section--destination">
                       <h3 class="event__section-title  event__section-title--destination">Destination</h3>
-                      <p class="event__destination-description">${destination.description}</p>
+                      
+                      ${destination.description ? `
+                        <p class="event__destination-description">${destination.description}</p>
+                      ` : ''}
+                      
+                      ${destination.pictures?.length ? `
+                        <div class="event__photos-container">
+                          <div class="event__photos-tape">
+                            ${destination.pictures.map((picture) => `
+                              <img class="event__photo" src="${picture.src}" alt="${picture.description || 'Destination photo'}">
+                            `).join('')}
+                          </div>
+                        </div>
+                      ` : ''}
                     </section>
                   ` : ''}
                 </section>
