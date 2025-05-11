@@ -11,14 +11,18 @@ export default class PointPresenter {
   #offers = null;
   #onDateChange = null;
   #onModeChange = null;
+  #allOffers = null;
+  #allDestination = null;
   #mode = Mode.DEFAULT;
 
-  constructor(container, point, destinations, offers, onDateChange, onModeChange) {
+  constructor(container, point, destinations, offers, allDestinations, allOffers, onDateChange, onModeChange) {
     this.container = container;
     this.#destinations = destinations;
     this.#offers = offers;
     this.#onDateChange = onDateChange;
     this.#onModeChange = onModeChange;
+    this.#allDestination = allDestinations;
+    this.#allOffers = allOffers;
   }
 
   init(point) {
@@ -26,7 +30,7 @@ export default class PointPresenter {
     const prevPointCompanent = this.#pointComponent;
     const prevEditPointCompanent = this.#editPointComponent;
     this.#pointComponent = new PointView(point, this.#destinations, this.#offers, this.#replacePointToEditForm, this.#addFavoriteClick);
-    this.#editPointComponent = new EditPointView(point, this.#destinations, this.#offers, this.#replaceEditFormToPoint, this.#replacePointToEditForm);
+    this.#editPointComponent = new EditPointView(point, this.#destinations, this.#offers, this.#allDestination, this.#allOffers, this.#replaceEditFormToPoint, this.#replacePointToEditForm);
     if (prevPointCompanent === null || prevEditPointCompanent === null) {
       render(this.#pointComponent, this.container);
       return;

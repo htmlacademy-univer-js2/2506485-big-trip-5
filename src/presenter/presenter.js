@@ -50,9 +50,11 @@ export default class Presenter {
   #renderPoints() {
     if (this.#points.length !== 0) {
       for (const point of this.#points) {
-        const destination = this.#destinationsModel.getDestinationById(point.destination);
-        const offers = point.offers.map((offerId) => this.#offersModel.getOfferById(offerId));
-        const pointPresenter = new PointPresenter(this.#pointListComponent.element, point, destination, offers, this.#onPointChange, this.#onModeChange);
+        const pointDestination = this.#destinationsModel.getDestinationById(point.destination);
+        const pointOffers = point.offers.map((offerId) => this.#offersModel.getOfferById(offerId));
+        const allDestinations = this.#destinationsModel.getDestinations();
+        const allOffers = this.#offersModel.getOffers();
+        const pointPresenter = new PointPresenter(this.#pointListComponent.element, point, pointDestination, pointOffers, allDestinations, allOffers, this.#onPointChange, this.#onModeChange);
         pointPresenter.init(point);
 
         this.#pointPresenters.set(point.id, pointPresenter);
