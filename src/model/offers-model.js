@@ -1,6 +1,7 @@
 import {offersMock} from '../mock/offers.js';
+import Observable from '../framework/observable.js';
 
-export default class OffersModel {
+export default class OffersModel extends Observable {
   offers = offersMock;
 
   getOffers() {
@@ -15,5 +16,11 @@ export default class OffersModel {
       }
     }
     return null;
+  }
+
+  getOffersByIds(offerIds) {
+    return offerIds
+      .map((id) => this.getOfferById(id))
+      .filter((offer) => offer !== null);
   }
 }
