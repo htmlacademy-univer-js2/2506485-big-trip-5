@@ -1,16 +1,16 @@
-import { isFuterePoint, isPastPoint, isPresentPoint } from './points';
-const FILTER_TYPES = {
-  EVERYTHING: 'everything',
-  FUTURE: 'future',
-  PRESENT: 'present',
-  PAST: 'past'
-};
+import { isFuturePoint, isPastPoint, isPresentPoint } from './points';
+import { FilterType } from './const';
 
 const filter = {
-  [FILTER_TYPES.EVERYTHING]: (points) => points,
-  [FILTER_TYPES.FUTURE]: (points) => points.filter((point) => isFuterePoint(point)),
-  [FILTER_TYPES.PRESENT]: (points) => points.filter((point) => isPresentPoint(point)),
-  [FILTER_TYPES.PAST]: (points) => points.filter((point) => isPastPoint(point))
+  [FilterType.EVERYTHING]: (points) => points,
+  [FilterType.FUTURE]: (points) => points.filter((point) => isFuturePoint(point)),
+  [FilterType.PRESENT]: (points) => points.filter((point) => isPresentPoint(point)),
+  [FilterType.PAST]: (points) => points.filter((point) => isPastPoint(point))
 };
 
-export{filter};
+const generateFilters = (points) => Object.entries(filter).map(([filterType, filterPoints])=> ({
+  type: filterType,
+  count: filterPoints(points).length
+}));
+
+export{filter, generateFilters};

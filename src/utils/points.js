@@ -40,6 +40,6 @@ function updatePointData(points, updatedPointData) {
 
 const isPresentPoint = (point) => dayjs(point.dateFrom).isBefore((dayjs())) && dayjs(point.dateTo).isAfter((dayjs()));
 
-const isFuterePoint = (point) => dayjs(point.dateFrom).isAfter(dayjs());
+const isFuturePoint = (point) => dayjs(point.dateFrom).isAfter(dayjs());
 
-export {getFormatTime, getFormatDay, getDuration, getFormatFullDate, isFuterePoint, isPastPoint, isPresentPoint, updatePointData};
+export {getFormatTime, getFormatDay, getDuration, getFormatFullDate, isFuturePoint, isPastPoint, isPresentPoint, updatePointData};
