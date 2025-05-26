@@ -1,14 +1,31 @@
-import { destinationsMock } from '../mock/destinations.js';
 import Observable from '../framework/observable.js';
 
-export default class DestionationsModel extends Observable{
-  destinations = destinationsMock;
+export default class DestinationsModel extends Observable {
+  #destinations = [];
+  #apiService = null;
 
-  getDestinations() {
-    return this.destinations;
+  constructor({ apiService }) {
+    super();
+    this.#apiService = apiService;
   }
 
-  getDestinationById (destinationId) {
-    return this.destinations.find((destination) => destination.id === destinationId);
+  getDestinations() {
+    return this.#destinations;
+  }
+
+  async init() {
+    try {
+      this.#destinations = await this.#apiService.destinations;
+    } catch(err) {
+      this.#destinations = [];
+    }
+  }
+
+  getDestinationById(id) {
+    return this.#destinations.find((destination) => destination.id === id);
+  }
+
+  getDestinationByName(name) {
+    return this.#destinations.find((destination) => destination.name === name);
   }
 }

@@ -8,6 +8,7 @@ import { UpdateType, UserAction } from '../utils/const.js';
 import { filter } from '../utils/filter.js';
 import { FilterType } from '../utils/const.js';
 import NewPointPresenter from './new-point-presenter.js';
+import LoadingView from '../view/loading-view.js';
 
 export default class Presenter {
   #pointListComponent = null;
@@ -19,6 +20,8 @@ export default class Presenter {
   #points = null;
   #sortComponent = null;
   #filterType = null;
+  #isLoading = true;
+  #loadingComponent = new LoadingView();
   #currentSortType = SortTypes.DAY;
   #pointPresenters = new Map();
   #newPointPresenter = null;
@@ -102,14 +105,12 @@ export default class Presenter {
         const allDestinations = this.#destinationsModel.getDestinations();
         const allOffers = this.#offersModel.getOffers();
 
-        const pointOffers = this.#offersModel.getOffersByIds(point.offers);
-
         const pointPresenter = new PointPresenter(
           this.#pointListComponent.element,
           this.#handleViewAction,
           this.#onModeChange
         );
-        pointPresenter.init(point, pointDestination, pointOffers, allDestinations, allOffers);
+        pointPresenter.init(point, pointDestination, allDestinations, allOffers);
 
         this.#pointPresenters.set(point.id, pointPresenter);
       }
@@ -195,6 +196,10 @@ export default class Presenter {
         this.#clearPointViews({resetSortType: true});
         this.#renderBoard();
         break;
+      case UpdateType.INIT:
+        this.#isLoading = false;
+        remove(this.#loadingComponent);
+        this.#renderPoints();
     }
   };
 }

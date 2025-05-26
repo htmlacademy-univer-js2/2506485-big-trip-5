@@ -4,6 +4,7 @@ import { getFormatTime } from '../utils/points.js';
 import { getDuration } from '../utils/points.js';
 
 function createPointTemplate (point, destination, offers) {
+  const newOffers = Array.isArray(offers) ? offers : [];
   const startDate = getFormatDay(point.dateFrom);
   const startTime = getFormatTime(point.dateFrom);
   const endTime = getFormatTime(point.dateTo);
@@ -22,7 +23,7 @@ function createPointTemplate (point, destination, offers) {
                 <p class="event__time">
                   <time class="event__start-time" datetime=${point.dateFrom}>${startTime}</time>
                   &mdash;
-                  <time class="event__end-time" datetime=${point.fateTo}>${endTime}</time>
+                  <time class="event__end-time" datetime=${point.dateTo}>${endTime}</time>
                 </p>
                 <p class="event__duration">${duration}</p>
               </div>
@@ -31,7 +32,7 @@ function createPointTemplate (point, destination, offers) {
               </p>
               <h4 class="visually-hidden">Offers:</h4>
               <ul class="event__selected-offers">
-                 ${offers.map((offer) => `
+                 ${newOffers.map((offer) => `
                   <li class="event__offer">
                     <span class="event__offer-title">${offer.title}</span>
                       &plus;&euro;&nbsp;
@@ -60,11 +61,11 @@ export default class PointView extends AbstractView{
   #onOpenEditButtonClick = null;
   #handleFavoriteClick = null;
 
-  constructor(point, destination, offers, onOpenEditButtonClick, onFavoriteClick){
+  constructor(point, allDestination, allOffers, onOpenEditButtonClick, onFavoriteClick){
     super();
     this.#point = point;
-    this.#destination = destination;
-    this.#offers = offers;
+    this.#destination = allDestination;
+    this.#offers = allOffers;
     this.#onOpenEditButtonClick = onOpenEditButtonClick;
     this.#setEventListeners();
     this.#handleFavoriteClick = onFavoriteClick;
