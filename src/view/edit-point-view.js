@@ -192,7 +192,6 @@ export default class EditPointView extends AbstractStatefulView {
   #validateDestinationInput = (evt) => {
     const input = evt.target;
     const inputValue = input.value.trim();
-
     const isValid = this._state.destinations.some(
       (dest) => dest.name.toLowerCase() === inputValue.toLowerCase()
     );
