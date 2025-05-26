@@ -11,6 +11,13 @@ const FilterType = {
   PAST: 'past'
 };
 
+const Method = {
+  POST: 'POST',
+  DELETE: 'DELETE',
+  PUT: 'PUT',
+  GET: 'GET'
+}
+
 const UserAction = {
   UPDATE_POINT: 'UPDATEPOINT',
   ADD_POINT: 'ADD_POINT',
@@ -21,6 +28,7 @@ const UpdateType = {
   PATCH: 'PATCH',
   MINOR: 'MINOR',
   MAJOR: 'MAJOR',
+  INIT: 'INIT',
 };
 
 const emptyListMessages = {
@@ -40,4 +48,4 @@ const EMPTY_POINT = {
   type: 'flight'
 };
 
-export {Mode, UpdateType, UserAction, emptyListMessages, FilterType, EMPTY_POINT};
+export {Mode, UpdateType, UserAction, emptyListMessages, FilterType, EMPTY_POINT, Method};
