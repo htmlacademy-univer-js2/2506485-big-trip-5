@@ -36,7 +36,12 @@ export default class PointsModel extends Observable {
 
     try {
       const response = await this.#apiService.updatePoint(update);
-      const updatedPoint = adaptToClient(response);
+      const updatedPoint = {
+        ...adaptToClient(response),
+        offers: update.offers || this.#points[index].offers,
+        destination: update.destination || this.#points[index].destination
+      };
+
       this.#points = [
         ...this.#points.slice(0, index),
         updatedPoint,

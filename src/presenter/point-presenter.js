@@ -26,23 +26,23 @@ export default class PointPresenter {
     this.#point = point;
     this.#destination = destination;
     this.#allDestinations = allDestinations;
-    this.#allOffers = allOffers; 
 
+    this.#allOffers = allOffers;
     const prevPointComponent = this.#pointComponent;
     const prevPointEditComponent = this.#pointEditComponent;
 
-    this.#pointComponent = new PointView(
+    this.#pointComponent = new PointView({
       point,
-      allDestinations,
-      allOffers,
-      this.#handleEditClick,
-      this.#handleFavoriteClick,
-    );
+      allDestination: this.#allDestinations,
+      allOffers: this.#allOffers,
+      onOpenEditButtonClick: this.#handleEditClick,
+      onFavoriteClick: this.#handleFavoriteClick,
+    });
 
     this.#pointEditComponent = new EditPointView({
       point,
-      allDestinations,
-      allOffers,
+      allDestinations: this.#allDestinations,
+      allOffers: this.#allOffers,
       isNew: false,
       onSubmit: this.#handleFormSubmit,
       onDeleteClick: this.#handleDeleteClick,
@@ -72,15 +72,17 @@ export default class PointPresenter {
   }
 
   #handleFavoriteClick = () => {
+    const updatedPoint = {
+      ...this.#point,
+      isFavorite: !this.#point.isFavorite,
+      offers: this.#point.offers,
+      destination: this.#point.destination
+    };
+
     this.#handleDataChange(
       UserAction.UPDATE_POINT,
       UpdateType.PATCH,
-      {
-        ...this.#point,
-        isFavorite: !this.#point.isFavorite,
-        destination: this.#point.destination,
-        offers: [...this.#point.offers]
-      }
+      updatedPoint
     );
   };
 
@@ -122,6 +124,7 @@ export default class PointPresenter {
       UpdateType.MINOR,
       update
     );
+    this.#replaceFormToPoint();
   };
 
   #handleDeleteClick = (point) => {
