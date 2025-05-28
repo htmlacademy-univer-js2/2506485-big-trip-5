@@ -10,6 +10,8 @@ const getFormatDay = (date) => dayjs(date).format(FORMAT_DAY);
 
 const getFormatFullDate = (date) => dayjs(date).format(FORMAT_FULL_DATE);
 
+const isDatesEqual = (date1, date2) => dayjs(date1).isSame(date2);
+
 const getDuration = (dateFrom, dateTo) => {
   const startTime = dayjs(dateFrom);
   const endTime = dayjs(dateTo);
@@ -42,4 +44,4 @@ const isPresentPoint = (point) => dayjs(point.dateFrom).isBefore((dayjs())) && d
 
 const isFuturePoint = (point) => dayjs(point.dateFrom).isAfter(dayjs());
 
-export {getFormatTime, getFormatDay, getDuration, getFormatFullDate, isFuturePoint, isPastPoint, isPresentPoint, updatePointData};
+export {getFormatTime, getFormatDay, getDuration, getFormatFullDate, isFuturePoint, isPastPoint, isPresentPoint, updatePointData, isDatesEqual};
