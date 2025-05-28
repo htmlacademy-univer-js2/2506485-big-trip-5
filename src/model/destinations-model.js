@@ -1,4 +1,5 @@
 import Observable from '../framework/observable.js';
+import { UpdateType } from '../utils/const.js';
 
 export default class DestinationsModel extends Observable {
   #destinations = [];
@@ -14,11 +15,14 @@ export default class DestinationsModel extends Observable {
   }
 
   async init() {
+    let isError = false;
     try {
       this.#destinations = await this.#apiService.destinations;
     } catch(err) {
+      isError = true;
       this.#destinations = [];
     }
+    this._notify(UpdateType.INIT, { isError });
   }
 
   getDestinationById(id) {

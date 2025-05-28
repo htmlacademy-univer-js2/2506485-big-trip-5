@@ -172,17 +172,15 @@ export default class Presenter {
 
   #handleModelEvent = (updateType, data) => {
     switch (updateType) {
-      case UpdateType.PATCH:{
+      case UpdateType.PATCH: {
         const point = data;
         const pointDestination = this.#destinationsModel.getDestinationById(point.destination);
         const allDestinations = this.#destinationsModel.getDestinations();
         const allOffers = this.#offersModel.getOffers();
-        const pointOffers = this.#offersModel.getOffersByIds(point.offers || []);
 
         this.#pointPresenters.get(point.id)?.init(
           point,
           pointDestination,
-          pointOffers,
           allDestinations,
           allOffers
         );
