@@ -14,14 +14,33 @@ export default class NewPointPresenter {
   #mode = Mode.DEFAULT;
   #onAddButtonUnblock = null;
 
-  constructor(pointListContainer, onDataChange, onModeChange, destinationsModel, offersModel, onAddButtonUnblock) {
-    this.#pointListContainer = pointListContainer;
-    this.#handleDataChange = onDataChange;
-    this.#handleModeChange = onModeChange;
-    this.#destinationsModel = destinationsModel;
-    this.#offersModel = offersModel;
-    this.#onAddButtonUnblock = onAddButtonUnblock;
+  constructor(pointListContainer, onDataChange, onModeChange, destinationsModel, offersModel) {
+  this.#pointListContainer = pointListContainer;
+  this.#handleDataChange = onDataChange;
+  this.#handleModeChange = onModeChange;
+  this.#destinationsModel = destinationsModel;
+  this.#offersModel = offersModel;
+}
+
+destroy = () => {
+  if (this.#pointEditComponent === null) {
+    return;
   }
+
+  document.removeEventListener('keydown', this.#escKeyDownHandler);
+  this.#mode = Mode.DEFAULT;
+
+  this.#handleModeChange();
+  remove(this.#pointEditComponent);
+  this.#pointEditComponent = null;
+};
+
+resetView = () => {
+  if (this.#mode !== Mode.CREATING) {
+    return;
+  }
+  this.destroy();
+};
 
   init() {
     if (this.#mode === Mode.CREATING) {
@@ -49,34 +68,19 @@ export default class NewPointPresenter {
     this.#mode = Mode.CREATING;
   }
 
-  destroy = () => {
-    if (this.#pointEditComponent === null) {
-      return;
-    }
-
-    remove(this.#pointEditComponent);
-    this.#pointEditComponent = null;
-    document.removeEventListener('keydown', this.#escKeyDownHandler);
-
-    this.#mode = Mode.DEFAULT;
-    this.#onAddButtonUnblock?.();
-  };
-
-  resetView = () => {
-    if (this.#mode !== Mode.CREATING) {
-      return;
-    }
-    this.destroy();
-  };
-
-  #handleFormSubmit = (point) => {
-    this.#handleDataChange(
+  #handleFormSubmit = async (point) => {
+  try {
+    this.setSaving();
+    await this.#handleDataChange(
       UserAction.ADD_POINT,
       UpdateType.MINOR,
       point
     );
     this.destroy();
-  };
+  } catch (error) {
+    this.setAborting();
+  }
+};
 
   #escKeyDownHandler = (evt) => {
     if (evt.key === 'Escape' || evt.key === 'Esc') {
@@ -84,4 +88,23 @@ export default class NewPointPresenter {
       this.destroy();
     }
   };
+
+  setSaving() {
+    this.#pointEditComponent.updateElement({
+      isDisabled: true,
+      isSaving: true,
+    });
+  }
+
+  setAborting() {
+    const resetFormState = () => {
+      this.#pointEditComponent.updateElement({
+        isDisabled: false,
+        isSaving: false,
+        isDeleting: false,
+      });
+    };
+
+    this.#pointEditComponent.shake(resetFormState);
+  }
 }

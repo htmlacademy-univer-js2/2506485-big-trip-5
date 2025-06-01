@@ -21,42 +21,73 @@ const offersModel = new OffersModel({ apiService: pointsApiService });
 const pointsModel = new PointsModel({ apiService: pointsApiService });
 const filterModel = new FilterModel();
 
-// Создаем экземпляры представлений
 const loadingView = new LoadingView();
 const errorView = new ErrorView();
 
-// Показываем загрузку
-tripEventsContainerElement.innerHTML = '';
-tripEventsContainerElement.append(loadingView.element);
+const showLoading = () => {
+  tripEventsContainerElement.innerHTML = '';
+  tripEventsContainerElement.append(loadingView.element);
+  newPointButton.disabled = true;
+};
 
-// Функция для обработки ошибок
-const handleError = () => {
+const showError = () => {
   tripEventsContainerElement.innerHTML = '';
   tripEventsContainerElement.append(errorView.element);
   newPointButton.disabled = true;
 };
 
-Promise.all([
-  destinationsModel.init().catch(handleError),
-  offersModel.init().catch(handleError),
-  pointsModel.init().catch(handleError)
-])
-  .then(() => {
-    tripEventsContainerElement.innerHTML = '';
-    const presenter = new Presenter(
-      tripEventsContainerElement,
-      pointsModel,
-      destinationsModel,
-      offersModel,
-      filterModel,
-    );
+const initApp = () => {
+  const presenter = new Presenter(
+    tripEventsContainerElement,
+    pointsModel,
+    destinationsModel,
+    offersModel,
+    filterModel,
+    showError // Передаем функцию showError в презентер
+  );
 
-    new FilterPresenter(filterContainerElement, filterModel, pointsModel).init();
-    presenter.init();
+  const filterPresenter = new FilterPresenter(
+    filterContainerElement,
+    filterModel,
+    pointsModel
+  );
 
-    newPointButton.addEventListener('click', () => {
-      presenter.createPoint();
-    });
-  })
-  .catch(() => {
+  filterPresenter.init();
+  presenter.init();
+  
+  if (pointsModel.getPoints().length > 0) {
+    newPointButton.disabled = false;
+  }
+  
+  newPointButton.addEventListener('click', () => {
+    presenter.createPoint();
   });
+};
+
+const initApplication = async () => {
+  showLoading();
+  
+  try {
+    // Пытаемся загрузить все данные
+    await Promise.all([
+      destinationsModel.init(),
+      offersModel.init(),
+      pointsModel.init()
+    ]);
+    
+    // Проверяем, что все критически важные данные загрузились
+    if (destinationsModel.getDestinations().length === 0 || 
+        offersModel.getOffers().length === 0) {
+      throw new Error('Critical data failed to load');
+    }
+    
+    // Если всё загрузилось успешно - инициализируем приложение
+    tripEventsContainerElement.innerHTML = '';
+    initApp();
+  } catch (error) {
+    console.error('Failed to load data:', error);
+    showError();
+  }
+};
+
+initApplication();

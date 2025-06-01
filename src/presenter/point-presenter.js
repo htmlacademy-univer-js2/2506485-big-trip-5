@@ -118,14 +118,18 @@ export default class PointPresenter {
     this.#replacePointToForm();
   };
 
-  #handleFormSubmit = (update) => {
-    this.#handleDataChange(
+  #handleFormSubmit = async (update) => {
+  try {
+    this.setSaving();
+    await this.#handleDataChange(
       UserAction.UPDATE_POINT,
       UpdateType.MINOR,
       update
     );
-    this.#replaceFormToPoint();
-  };
+  } catch (error) {
+    this.setAborting();
+  }
+};
 
   #handleDeleteClick = (point) => {
     this.#handleDataChange(
@@ -138,4 +142,39 @@ export default class PointPresenter {
   #handleCloseClick = () => {
     this.#replaceFormToPoint();
   };
+
+  setSaving () {
+    if (this.#mode === Mode.EDITING){
+      this.#pointEditComponent.updateElement({
+        isDisabled: true,
+        isSaving: true,
+      });
+    }
+  }
+
+  setDeleting () {
+    if (this.#mode === Mode.EDITING){
+      this.#pointEditComponent.updateElement({
+        isDisabled: true,
+        isDeleting: true,
+      });
+    }
+  }
+
+  setAborting() {
+  if (this.#mode === Mode.DEFAULT) {
+    this.#pointComponent.shake();
+    return;
+  }
+
+  const resetFormState = () => {
+    this.#pointEditComponent.updateElement({
+      isDisabled: false,
+      isSaving: false,
+      isDeleting: false
+    });
+  };
+  
+  this.#pointEditComponent.shake(resetFormState);
+}
 }
