@@ -10,6 +10,8 @@ import { FilterType } from '../utils/const.js';
 import NewPointPresenter from './new-point-presenter.js';
 import LoadingView from '../view/loading-view.js';
 import UiBlocker from '../framework/ui-blocker/ui-blocker.js';
+import { getTripCities, formatTripRoute, getTripDates, calculateTotalPrice } from '../utils/trip-info.js';
+import TripInfoView from '../view/trip-info-view.js';
 
 const TimeLimit = {
   LOWER_LIMIT: 350,
@@ -31,6 +33,9 @@ export default class Presenter {
   #currentSortType = SortTypes.DAY;
   #pointPresenters = new Map();
   #newPointPresenter = null;
+  #tripInfoContainer = null;
+  #tripInfoView = null;
+
 
   #uiBlocker = new UiBlocker({
     lowerLimit: TimeLimit.LOWER_LIMIT,
@@ -49,6 +54,7 @@ export default class Presenter {
     this.#offersModel.addObserver(this.#handleModelEvent);
     this.#destinationsModel.addObserver(this.#handleModelEvent);
     this.#filterModel.addObserver(this.#handleModelEvent);
+    this.#tripInfoContainer = document.querySelector('.trip-main');
 
     this.#newPointPresenter = new NewPointPresenter(
       this.#pointListComponent.element,
@@ -80,6 +86,7 @@ export default class Presenter {
   init() {
     this.#points = this.#pointsModel.getPoints();
     this.#renderBoard();
+    this.#renderTripInfo();
   }
 
   createPoint() {
@@ -87,6 +94,29 @@ export default class Presenter {
     this.#filterModel.setFilter(UpdateType.MAJOR, FilterType.EVERYTHING);
     this.#newPointPresenter.init();
   }
+
+  #renderTripInfo() {
+  const points = this.#pointsModel.getPoints();
+  const destinations = this.#destinationsModel.getDestinations();
+  const offers = this.#offersModel.getOffers();
+
+  if (!points.length || !destinations.length || !offers.length) {
+    return;
+  }
+
+  const tripInfoData = {
+    route: formatTripRoute(getTripCities(points, destinations)),
+    duration: getTripDates(points), // уже возвращает {start, end}
+    totalCost: calculateTotalPrice(points, offers)
+  };
+
+  if (this.#tripInfoView) {
+    remove(this.#tripInfoView);
+  }
+
+  this.#tripInfoView = new TripInfoView(tripInfoData);
+  render(this.#tripInfoView, this.#tripInfoContainer, RenderPosition.AFTERBEGIN);
+}
 
   #renderBoard() {
     render(this.#pointListComponent, this.#tripEventsContainer);
@@ -212,6 +242,7 @@ export default class Presenter {
         allDestinations,
         allOffers
       );
+      this.#renderTripInfo();
       break;
     }
       case UpdateType.MINOR:
@@ -226,6 +257,7 @@ export default class Presenter {
         this.#isLoading = false;
         remove(this.#loadingComponent);
         this.#renderPoints();
+        this.#renderTripInfo();
     }
   };
 }
