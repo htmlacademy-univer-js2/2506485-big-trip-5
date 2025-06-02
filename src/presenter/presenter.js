@@ -248,10 +248,12 @@ export default class Presenter {
       case UpdateType.MINOR:
         this.#clearPointViews();
         this.#renderBoard();
+        this.#renderTripInfo();
         break;
       case UpdateType.MAJOR:
         this.#clearPointViews({resetSortType: true});
         this.#renderBoard();
+        this.#renderTripInfo();
         break;
       case UpdateType.INIT:
         this.#isLoading = false;

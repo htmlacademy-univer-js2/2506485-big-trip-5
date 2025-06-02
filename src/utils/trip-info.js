@@ -1,14 +1,7 @@
 import dayjs from 'dayjs';
 import { SortTypes, sortByDay } from './sort.js';
 
-const DATE_FORMAT = 'MMM DD'; // Формат для отображения дат в информации о поездке
-
-/**
- * Получает маршрут поездки в виде массива названий городов
- * @param {Array<Point>} points - Массив точек маршрута
- * @param {Array<Destination>} destinations - Массив возможных направлений
- * @return {Array<string>} - Массив названий городов в порядке посещения
- */
+const DATE_FORMAT = 'MMM DD'; 
 const getTripCities = (points, destinations) => {
   if (!points.length || !destinations.length) return [];
   
@@ -20,11 +13,6 @@ const getTripCities = (points, destinations) => {
   }).filter(Boolean);
 };
 
-/**
- * Форматирует маршрут для отображения
- * @param {Array<string>} cities - Массив городов маршрута
- * @return {string} - Отформатированная строка маршрута
- */
 const formatTripRoute = (cities) => {
   if (!cities.length) return '';
   
@@ -40,11 +28,6 @@ const formatTripRoute = (cities) => {
   }
 };
 
-/**
- * Получает даты начала и окончания поездки
- * @param {Array<Point>} points - Массив точек маршрута
- * @return {Object} - Объект с датами начала и окончания
- */
 const getTripDates = (points) => {
   if (!points.length) return { start: '', end: '' };
   
@@ -55,12 +38,6 @@ const getTripDates = (points) => {
   };
 };
 
-/**
- * Вычисляет общую стоимость поездки
- * @param {Array<Point>} points - Массив точек маршрута
- * @param {Array<OfferGroup>} offers - Массив групп предложений
- * @return {number} - Общая стоимость поездки
- */
 const calculateTotalPrice = (points, offers) => {
   if (!points.length) return 0;
   
