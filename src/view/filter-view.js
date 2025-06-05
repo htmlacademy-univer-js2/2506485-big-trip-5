@@ -1,6 +1,6 @@
 import AbstractView from '../framework/view/abstract-view.js';
 
-function createFilterTemplate(filters, currentFilterType, hasNoPoints) {
+function createFilterTemplate(filters, currentFilterType) {
   return (`<form class="trip-filters" action="#" method="get">
     ${filters.map((filter) => `<div class="trip-filters__filter">
       <input id="filter-${filter.type}" 
@@ -9,8 +9,10 @@ function createFilterTemplate(filters, currentFilterType, hasNoPoints) {
              name="trip-filter" 
              value="${filter.type}"
              ${filter.type === currentFilterType ? 'checked' : ''}
-             ${hasNoPoints && filter.type !== 'everything' ? 'disabled' : ''}>
-      <label class="trip-filters__filter-label" for="filter-${filter.type}">
+             ${filter.count === 0 ? 'disabled' : ''}>
+      <label class="trip-filters__filter-label" 
+             for="filter-${filter.type}"
+             ${filter.count === 0 ? 'style="opacity: 0.5"' : ''}>
         ${filter.type}
       </label>
     </div>`).join('')}
