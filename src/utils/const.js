@@ -16,7 +16,7 @@ const Method = {
   DELETE: 'DELETE',
   PUT: 'PUT',
   GET: 'GET'
-}
+};
 
 const UserAction = {
   UPDATE_POINT: 'UPDATEPOINT',

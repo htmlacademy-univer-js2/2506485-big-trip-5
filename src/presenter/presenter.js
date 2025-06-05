@@ -9,6 +9,14 @@ import { filter } from '../utils/filter.js';
 import { FilterType } from '../utils/const.js';
 import NewPointPresenter from './new-point-presenter.js';
 import LoadingView from '../view/loading-view.js';
+import UiBlocker from '../framework/ui-blocker/ui-blocker.js';
+import { getTripCities, formatTripRoute, getTripDates, calculateTotalPrice } from '../utils/trip-info.js';
+import TripInfoView from '../view/trip-info-view.js';
+
+const TimeLimit = {
+  LOWER_LIMIT: 350,
+  UPPER_LIMIT: 1000,
+};
 
 export default class Presenter {
   #pointListComponent = null;
@@ -25,6 +33,14 @@ export default class Presenter {
   #currentSortType = SortTypes.DAY;
   #pointPresenters = new Map();
   #newPointPresenter = null;
+  #tripInfoContainer = null;
+  #tripInfoView = null;
+
+
+  #uiBlocker = new UiBlocker({
+    lowerLimit: TimeLimit.LOWER_LIMIT,
+    upperLimit: TimeLimit.UPPER_LIMIT
+  });
 
   constructor(tripEventsContainer, pointsModel, destinationsModel, offersModel, filterModel) {
     this.#tripEventsContainer = tripEventsContainer;
@@ -34,14 +50,15 @@ export default class Presenter {
     this.#filterModel = filterModel;
     this.#pointListComponent = new PointListView();
 
-    this.#pointsModel.addObserver(this.#handleModelEvent);
-    this.#offersModel.addObserver(this.#handleModelEvent);
-    this.#destinationsModel.addObserver(this.#handleModelEvent);
-    this.#filterModel.addObserver(this.#handleModelEvent);
+    this.#pointsModel.addObserver(this.#onModelEvent);
+    this.#offersModel.addObserver(this.#onModelEvent);
+    this.#destinationsModel.addObserver(this.#onModelEvent);
+    this.#filterModel.addObserver(this.#onModelEvent);
+    this.#tripInfoContainer = document.querySelector('.trip-main');
 
     this.#newPointPresenter = new NewPointPresenter(
       this.#pointListComponent.element,
-      this.#handleViewAction,
+      this.#onViewAction,
       this.#onModeChange,
       destinationsModel,
       offersModel,
@@ -69,12 +86,36 @@ export default class Presenter {
   init() {
     this.#points = this.#pointsModel.getPoints();
     this.#renderBoard();
+    this.#renderTripInfo();
   }
 
   createPoint() {
     this.#currentSortType = SortTypes.DAY;
     this.#filterModel.setFilter(UpdateType.MAJOR, FilterType.EVERYTHING);
     this.#newPointPresenter.init();
+  }
+
+  #renderTripInfo() {
+    const points = this.#pointsModel.getPoints();
+    const destinations = this.#destinationsModel.getDestinations();
+    const offers = this.#offersModel.getOffers();
+
+    if (!points.length || !destinations.length || !offers.length) {
+      return;
+    }
+
+    const tripInfoData = {
+      route: formatTripRoute(getTripCities(points, destinations)),
+      duration: getTripDates(points),
+      totalCost: calculateTotalPrice(points, offers)
+    };
+
+    if (this.#tripInfoView) {
+      remove(this.#tripInfoView);
+    }
+
+    this.#tripInfoView = new TripInfoView(tripInfoData);
+    render(this.#tripInfoView, this.#tripInfoContainer, RenderPosition.AFTERBEGIN);
   }
 
   #renderBoard() {
@@ -107,7 +148,7 @@ export default class Presenter {
 
         const pointPresenter = new PointPresenter(
           this.#pointListComponent.element,
-          this.#handleViewAction,
+          this.#onViewAction,
           this.#onModeChange
         );
         pointPresenter.init(point, pointDestination, allDestinations, allOffers);
@@ -156,50 +197,73 @@ export default class Presenter {
     this.#pointPresenters.forEach((presenter) => presenter.resetView());
   };
 
-  #handleViewAction = (actionType, updateType, update) => {
-    switch (actionType){
-      case UserAction.UPDATE_POINT:
-        this.#pointsModel.updatePoint(updateType, update);
-        break;
-      case UserAction.ADD_POINT:
-        this.#pointsModel.addPoint(updateType, update);
-        break;
-      case UserAction.DELETE_POINT:
-        this.#pointsModel.deletePoint(updateType, update);
-        break;
+  #onViewAction = async (actionType, updateType, update) => {
+    this.#uiBlocker.block();
+    try {
+      switch (actionType) {
+        case UserAction.UPDATE_POINT:
+          this.#pointPresenters.get(update.id).setSaving();
+          await this.#pointsModel.updatePoint(updateType, update);
+          break;
+        case UserAction.ADD_POINT:
+          this.#newPointPresenter.setSaving();
+          await this.#pointsModel.addPoint(updateType, update);
+          break;
+        case UserAction.DELETE_POINT:
+          this.#pointPresenters.get(update.id).setDeleting();
+          await this.#pointsModel.deletePoint(updateType, update);
+          break;
+      }
+    } catch (err) {
+      switch (actionType) {
+        case UserAction.UPDATE_POINT:
+          this.#pointPresenters.get(update.id).setAborting();
+          break;
+        case UserAction.ADD_POINT:
+          this.#newPointPresenter.setAborting();
+          break;
+        case UserAction.DELETE_POINT:
+          this.#pointPresenters.get(update.id).setAborting();
+          break;
+      }
+      throw err;
+    } finally {
+      this.#uiBlocker.unblock();
     }
   };
 
-  #handleModelEvent = (updateType, data) => {
+  #onModelEvent = (updateType, data) => {
     switch (updateType) {
-      case UpdateType.PATCH:{
+      case UpdateType.PATCH: {
         const point = data;
         const pointDestination = this.#destinationsModel.getDestinationById(point.destination);
         const allDestinations = this.#destinationsModel.getDestinations();
         const allOffers = this.#offersModel.getOffers();
-        const pointOffers = this.#offersModel.getOffersByIds(point.offers || []);
 
         this.#pointPresenters.get(point.id)?.init(
           point,
           pointDestination,
-          pointOffers,
           allDestinations,
           allOffers
         );
+        this.#renderTripInfo();
         break;
       }
       case UpdateType.MINOR:
         this.#clearPointViews();
         this.#renderBoard();
+        this.#renderTripInfo();
         break;
       case UpdateType.MAJOR:
         this.#clearPointViews({resetSortType: true});
         this.#renderBoard();
+        this.#renderTripInfo();
         break;
       case UpdateType.INIT:
         this.#isLoading = false;
         remove(this.#loadingComponent);
         this.#renderPoints();
+        this.#renderTripInfo();
     }
   };
 }
