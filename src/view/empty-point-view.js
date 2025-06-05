@@ -10,12 +10,12 @@ function createEmptyListTemplate(filterType) {
 
 export default class EmptyListView extends AbstractView {
   #filterType = null;
-  #handleNewEventClick = null;
+  #onNewEventClick = null;
 
   constructor(filterType, onNewEventClick) {
     super();
     this.#filterType = filterType;
-    this.#handleNewEventClick = onNewEventClick;
+    this.#onNewEventClick = onNewEventClick;
     this.element.querySelector('.trip-main__event-add-btn')
       ?.addEventListener('click', this.#newEventClickHandler);
   }
@@ -26,6 +26,6 @@ export default class EmptyListView extends AbstractView {
 
   #newEventClickHandler = (evt) => {
     evt.preventDefault();
-    this.#handleNewEventClick();
+    this.#onNewEventClick();
   };
 }

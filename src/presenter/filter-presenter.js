@@ -15,8 +15,8 @@ export default class FilterPresenter{
     this.#filterModel = filterModel;
     this.#pointsModel = pointsModel;
 
-    this.#pointsModel.addObserver(this.#handleModelEvent);
-    this.#filterModel.addObserver(this.#handleModelEvent);
+    this.#pointsModel.addObserver(this.#onModelEvent);
+    this.#filterModel.addObserver(this.#onModelEvent);
   }
 
   get filters() {
@@ -49,7 +49,7 @@ export default class FilterPresenter{
     }
   }
 
-  #handleModelEvent = () => {
+  #onModelEvent = () => {
     this.init();
   };
 
@@ -60,4 +60,3 @@ export default class FilterPresenter{
     this.#filterModel.setFilter(UpdateType.MAJOR, filterType);
   };
 }
-

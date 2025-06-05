@@ -16,15 +16,13 @@ export default class PointsModel extends Observable {
   }
 
   async init() {
-    let isError = false;
     try {
       const points = await this.#apiService.points;
       this.#points = points.map(adaptToClient);
-    } catch(err) {
+    } catch {
       this.#points = [];
-      isError = true;
     }
-    this._notify(UpdateType.INIT, { isError });
+    this._notify(UpdateType.INIT);
   }
 
   async updatePoint(updateType, update) {
@@ -37,6 +35,7 @@ export default class PointsModel extends Observable {
     try {
       const response = await this.#apiService.updatePoint(update);
       const updatedPoint = adaptToClient(response);
+
       this.#points = [
         ...this.#points.slice(0, index),
         updatedPoint,
@@ -54,7 +53,8 @@ export default class PointsModel extends Observable {
       const newPoint = adaptToClient(response);
       this.#points = [newPoint, ...this.#points];
       this._notify(updateType, newPoint);
-    } catch(err) {
+      return newPoint;
+    } catch (error) {
       throw new Error('Can\'t add point');
     }
   }
