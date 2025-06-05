@@ -1,22 +1,22 @@
-export function adaptToServer(point) {
+function adaptToServer(point) {
   const dateFrom = point.dateFrom instanceof Date ? point.dateFrom.toISOString() : point.dateFrom;
   const dateTo = point.dateTo instanceof Date ? point.dateTo.toISOString() : point.dateTo;
 
   const adaptedPoint = {
-    base_price: Number(point.basePrice),
-    date_from: dateFrom,
-    date_to: dateTo,
-    destination: point.destination,
-    is_favorite: Boolean(point.isFavorite),
-    offers: Array.isArray(point.offers) ? point.offers : [],
-    type: point.type
+    'base_price': Number(point.basePrice),
+    'date_from': dateFrom,
+    'date_to': dateTo,
+    'destination': point.destination,
+    'is_favorite': Boolean(point.isFavorite),
+    'offers': Array.isArray(point.offers) ? point.offers : [],
+    'type': point.type
   };
 
   return adaptedPoint;
 }
 
 
-export function adaptToClient(point) {
+function adaptToClient(point) {
   const adaptedPoint = {
     ...point,
     dateFrom: point['date_from'] !== null ? new Date(point['date_from']) : new Date(point['date_from']),
@@ -32,3 +32,5 @@ export function adaptToClient(point) {
 
   return adaptedPoint;
 }
+
+export {adaptToClient, adaptToServer};

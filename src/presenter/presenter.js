@@ -50,15 +50,15 @@ export default class Presenter {
     this.#filterModel = filterModel;
     this.#pointListComponent = new PointListView();
 
-    this.#pointsModel.addObserver(this.#handleModelEvent);
-    this.#offersModel.addObserver(this.#handleModelEvent);
-    this.#destinationsModel.addObserver(this.#handleModelEvent);
-    this.#filterModel.addObserver(this.#handleModelEvent);
+    this.#pointsModel.addObserver(this.#onModelEvent);
+    this.#offersModel.addObserver(this.#onModelEvent);
+    this.#destinationsModel.addObserver(this.#onModelEvent);
+    this.#filterModel.addObserver(this.#onModelEvent);
     this.#tripInfoContainer = document.querySelector('.trip-main');
 
     this.#newPointPresenter = new NewPointPresenter(
       this.#pointListComponent.element,
-      this.#handleViewAction,
+      this.#onViewAction,
       this.#onModeChange,
       destinationsModel,
       offersModel,
@@ -96,27 +96,27 @@ export default class Presenter {
   }
 
   #renderTripInfo() {
-  const points = this.#pointsModel.getPoints();
-  const destinations = this.#destinationsModel.getDestinations();
-  const offers = this.#offersModel.getOffers();
+    const points = this.#pointsModel.getPoints();
+    const destinations = this.#destinationsModel.getDestinations();
+    const offers = this.#offersModel.getOffers();
 
-  if (!points.length || !destinations.length || !offers.length) {
-    return;
+    if (!points.length || !destinations.length || !offers.length) {
+      return;
+    }
+
+    const tripInfoData = {
+      route: formatTripRoute(getTripCities(points, destinations)),
+      duration: getTripDates(points),
+      totalCost: calculateTotalPrice(points, offers)
+    };
+
+    if (this.#tripInfoView) {
+      remove(this.#tripInfoView);
+    }
+
+    this.#tripInfoView = new TripInfoView(tripInfoData);
+    render(this.#tripInfoView, this.#tripInfoContainer, RenderPosition.AFTERBEGIN);
   }
-
-  const tripInfoData = {
-    route: formatTripRoute(getTripCities(points, destinations)),
-    duration: getTripDates(points), // уже возвращает {start, end}
-    totalCost: calculateTotalPrice(points, offers)
-  };
-
-  if (this.#tripInfoView) {
-    remove(this.#tripInfoView);
-  }
-
-  this.#tripInfoView = new TripInfoView(tripInfoData);
-  render(this.#tripInfoView, this.#tripInfoContainer, RenderPosition.AFTERBEGIN);
-}
 
   #renderBoard() {
     render(this.#pointListComponent, this.#tripEventsContainer);
@@ -148,7 +148,7 @@ export default class Presenter {
 
         const pointPresenter = new PointPresenter(
           this.#pointListComponent.element,
-          this.#handleViewAction,
+          this.#onViewAction,
           this.#onModeChange
         );
         pointPresenter.init(point, pointDestination, allDestinations, allOffers);
@@ -197,54 +197,58 @@ export default class Presenter {
     this.#pointPresenters.forEach((presenter) => presenter.resetView());
   };
 
-  #handleViewAction = async (actionType, updateType, update) => {
+  #onViewAction = async (actionType, updateType, update) => {
     this.#uiBlocker.block();
-    switch (actionType){
-      case UserAction.UPDATE_POINT:
-        this.#pointPresenters.get(update.id).setSaving();
-        try{
-        await this.#pointsModel.updatePoint(updateType, update);
-        } catch (err){
-          this.#pointPresenters.get(update.id).setAborting();
-        }
-        break;
-      case UserAction.ADD_POINT:
-        this.#newPointPresenter.setSaving();
-        try{
+    try {
+      switch (actionType) {
+        case UserAction.UPDATE_POINT:
+          this.#pointPresenters.get(update.id).setSaving();
+          await this.#pointsModel.updatePoint(updateType, update);
+          break;
+        case UserAction.ADD_POINT:
+          this.#newPointPresenter.setSaving();
           await this.#pointsModel.addPoint(updateType, update);
-        } catch (err){
-          this.#newPointPresenter.setAborting();
-        }
-        break;
-      case UserAction.DELETE_POINT:
-        this.#pointPresenters.get(update.id).setDeleting();
-        try {
+          break;
+        case UserAction.DELETE_POINT:
+          this.#pointPresenters.get(update.id).setDeleting();
           await this.#pointsModel.deletePoint(updateType, update);
-        } catch (err){
+          break;
+      }
+    } catch (err) {
+      switch (actionType) {
+        case UserAction.UPDATE_POINT:
           this.#pointPresenters.get(update.id).setAborting();
-        }
-        break;
+          break;
+        case UserAction.ADD_POINT:
+          this.#newPointPresenter.setAborting();
+          break;
+        case UserAction.DELETE_POINT:
+          this.#pointPresenters.get(update.id).setAborting();
+          break;
+      }
+      throw err;
+    } finally {
+      this.#uiBlocker.unblock();
     }
-    this.#uiBlocker.unblock();
   };
 
-  #handleModelEvent = (updateType, data) => {
-  switch (updateType) {
-    case UpdateType.PATCH: {
-      const point = data;
-      const pointDestination = this.#destinationsModel.getDestinationById(point.destination);
-      const allDestinations = this.#destinationsModel.getDestinations();
-      const allOffers = this.#offersModel.getOffers();
+  #onModelEvent = (updateType, data) => {
+    switch (updateType) {
+      case UpdateType.PATCH: {
+        const point = data;
+        const pointDestination = this.#destinationsModel.getDestinationById(point.destination);
+        const allDestinations = this.#destinationsModel.getDestinations();
+        const allOffers = this.#offersModel.getOffers();
 
-      this.#pointPresenters.get(point.id)?.init(
-        point,
-        pointDestination,
-        allDestinations,
-        allOffers
-      );
-      this.#renderTripInfo();
-      break;
-    }
+        this.#pointPresenters.get(point.id)?.init(
+          point,
+          pointDestination,
+          allDestinations,
+          allOffers
+        );
+        this.#renderTripInfo();
+        break;
+      }
       case UpdateType.MINOR:
         this.#clearPointViews();
         this.#renderBoard();

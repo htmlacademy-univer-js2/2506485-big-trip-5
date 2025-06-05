@@ -16,50 +16,48 @@ export default class PointsModel extends Observable {
   }
 
   async init() {
-    let isError = false;
     try {
       const points = await this.#apiService.points;
       this.#points = points.map(adaptToClient);
     } catch {
       this.#points = [];
-      isError = true;
     }
     this._notify(UpdateType.INIT);
   }
 
   async updatePoint(updateType, update) {
-  const index = this.#points.findIndex((point) => point.id === update.id);
+    const index = this.#points.findIndex((point) => point.id === update.id);
 
-  if (index === -1) {
-    throw new Error('Can\'t update unexisting point');
+    if (index === -1) {
+      throw new Error('Can\'t update unexisting point');
+    }
+
+    try {
+      const response = await this.#apiService.updatePoint(update);
+      const updatedPoint = adaptToClient(response);
+
+      this.#points = [
+        ...this.#points.slice(0, index),
+        updatedPoint,
+        ...this.#points.slice(index + 1)
+      ];
+      this._notify(updateType, updatedPoint);
+    } catch(err) {
+      throw new Error('Can\'t update point');
+    }
   }
-
-  try {
-    const response = await this.#apiService.updatePoint(update);
-    const updatedPoint = adaptToClient(response);
-
-    this.#points = [
-      ...this.#points.slice(0, index),
-      updatedPoint,
-      ...this.#points.slice(index + 1)
-    ];
-    this._notify(updateType, updatedPoint);
-  } catch(err) {
-    throw new Error('Can\'t update point');
-  }
-}
 
   async addPoint(updateType, update) {
-  try {
-    const response = await this.#apiService.addPoint(update);
-    const newPoint = adaptToClient(response);
-    this.#points = [newPoint, ...this.#points];
-    this._notify(updateType, newPoint);
-    return newPoint;
-  } catch (error) {
-    throw new Error('Can\'t add point');
+    try {
+      const response = await this.#apiService.addPoint(update);
+      const newPoint = adaptToClient(response);
+      this.#points = [newPoint, ...this.#points];
+      this._notify(updateType, newPoint);
+      return newPoint;
+    } catch (error) {
+      throw new Error('Can\'t add point');
+    }
   }
-}
 
   async deletePoint(updateType, update) {
     const index = this.#points.findIndex((point) => point.id === update.id);

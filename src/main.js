@@ -43,7 +43,7 @@ const initApp = () => {
     destinationsModel,
     offersModel,
     filterModel,
-    showError // Передаем функцию showError в презентер
+    showError
   );
 
   const filterPresenter = new FilterPresenter(
@@ -54,11 +54,10 @@ const initApp = () => {
 
   filterPresenter.init();
   presenter.init();
-  
   if (pointsModel.getPoints().length > 0) {
     newPointButton.disabled = false;
   }
-  
+
   newPointButton.addEventListener('click', () => {
     presenter.createPoint();
   });
@@ -66,26 +65,22 @@ const initApp = () => {
 
 const initApplication = async () => {
   showLoading();
-  
+
   try {
-    // Пытаемся загрузить все данные
     await Promise.all([
       destinationsModel.init(),
       offersModel.init(),
       pointsModel.init()
     ]);
-    
-    // Проверяем, что все критически важные данные загрузились
-    if (destinationsModel.getDestinations().length === 0 || 
+
+    if (destinationsModel.getDestinations().length === 0 ||
         offersModel.getOffers().length === 0) {
       throw new Error('Critical data failed to load');
     }
-    
-    // Если всё загрузилось успешно - инициализируем приложение
+
     tripEventsContainerElement.innerHTML = '';
     initApp();
   } catch (error) {
-    console.error('Failed to load data:', error);
     showError();
   }
 };
